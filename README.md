@@ -22,3 +22,4 @@ Apply the manifests:
 
 kubectl apply -f apps/headlamp/headlamp.yaml
 kubectl apply -f apps/headlamp/ingress.yaml
+#
