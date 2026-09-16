@@ -16,7 +16,7 @@ All three nodes run the control plane, embedded etcd and workloads.
 
 Kubernetes management dashboard available internally at:
 
-http://headlamp.k3s.joeyme.eu
+https://headlamp.k3s.joeyme.eu
 
 Apply the manifests:
 
