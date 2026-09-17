@@ -1,0 +1,16 @@
+# Kubernetes credentials
+*.kubeconfig
+kubeconfig*
+
+# Environment and secrets
+.env
+.env.*
+*.key
+*.pem
+**/secret.yaml
+**/secrets.yaml
+**/secrets-*.yaml
+
+# Editors
+.vscode/
+.idea/
