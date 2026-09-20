@@ -1,0 +1,15 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: synology-iscsi-delete
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: csi.san.synology.com
+parameters:
+  dsm: 192.168.100.61
+  fsType: ext4
+  location: /volume1
+  protocol: iscsi
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
