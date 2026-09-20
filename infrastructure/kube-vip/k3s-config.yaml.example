@@ -1,10 +1,14 @@
 # Install this as /etc/rancher/k3s/config.yaml on every K3s server.
 #
-# tls-san makes the API certificate valid for the control-plane VIP.
+# tls-san makes the API certificate valid for the control-plane VIP and DNS name.
 # servicelb is disabled because kube-vip will replace it.
+# secrets-encryption encrypts Kubernetes Secret data before it is written to etcd.
 
 tls-san:
   - 192.168.100.200
+  - api.k3s.joeyme.eu
 
 disable:
   - servicelb
+
+secrets-encryption: true

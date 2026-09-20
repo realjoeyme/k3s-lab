@@ -10,6 +10,9 @@ kubeconfig*
 **/secret.yaml
 **/secrets.yaml
 **/secrets-*.yaml
+**/client-info.yml
+**/client-info-secret*.yaml
+**/private/
 
 # Editors
 .vscode/

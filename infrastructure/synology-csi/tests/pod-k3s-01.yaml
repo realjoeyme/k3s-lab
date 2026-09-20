@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iscsi-smoke
+  namespace: synology-csi-test
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: k3s-01
+  containers:
+    - name: test
+      image: busybox:1.36.1
+      command:
+        - /bin/sh
+        - -c
+      args:
+        - |
+          set -eu
+          if [ ! -f /data/proof.txt ]; then
+            printf '%s\n' 'Synology CSI persistence test' > /data/proof.txt
+            sha256sum /data/proof.txt > /data/proof.sha256
+            sync
+          fi
+          cd /data
+          sha256sum -c proof.sha256
+          sleep 3600
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: iscsi-smoke-test

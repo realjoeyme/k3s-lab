@@ -1,0 +1,13 @@
+# Copy this file to a private, Git-ignored location and replace the placeholders.
+# Never commit the populated file.
+clients:
+  - host: 192.168.100.61
+    port: 5001
+    https: true
+    username: k3s-iscsi
+    password: REPLACE_LOCALLY
+    tlsCACert: |
+      -----BEGIN CERTIFICATE-----
+      REPLACE_WITH_THE_DSM_CA_CERTIFICATE
+      -----END CERTIFICATE-----
+    tlsServerName: synology
