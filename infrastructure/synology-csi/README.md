@@ -40,6 +40,7 @@ synology-csi/
 ├── README.md
 ├── client-info.yml.example
 ├── storageclass.yaml
+├── synology-iscsi-delete.yaml
 ├── tests
 │   ├── pod-k3s-01.yaml
 │   ├── pod-k3s-02.yaml
@@ -241,10 +242,21 @@ kubectl apply -f \
   infrastructure/synology-csi/upstream-v1.3.1/node.yaml
 kubectl apply -f \
   infrastructure/synology-csi/storageclass.yaml
+kubectl apply -f \
+  infrastructure/synology-csi/synology-iscsi-delete.yaml
 ~~~
 
 local-path remains the default StorageClass. Workloads must explicitly
-request synology-iscsi-retain.
+request one of the Synology classes:
+
+| StorageClass | PVC deletion behavior | Intended use |
+| --- | --- | --- |
+| synology-iscsi-retain | Keeps the PV, LUN and target | Important application data and deliberate cleanup |
+| synology-iscsi-delete | Deletes the PV, LUN and target | Disposable or easily recreated data |
+
+Both classes use iSCSI with ext4, support online expansion and are
+non-default. Choose the class when creating the PVC; changing the default
+StorageClass does not alter an existing PV's reclaim policy.
 
 ## 6. Validate the installation
 
@@ -262,7 +274,9 @@ Expected state:
 - One node pod on each K3s node: 2/2 Running
 - CSI driver: csi.san.synology.com
 - Plugin image everywhere: synology/synology-csi:v1.3.1
-- synology-iscsi-retain is non-default, expandable and uses Retain
+- Both Synology StorageClasses are non-default and expandable
+- synology-iscsi-retain uses Retain
+- synology-iscsi-delete uses Delete
 
 ## 7. End-to-end storage test
 
@@ -378,8 +392,14 @@ backend cleanup.
 
 ## Operational notes
 
+- Deleting a PVC that uses synology-iscsi-delete permanently deletes its
+  dynamically provisioned Synology LUN and target. Confirm the namespace,
+  claim and StorageClass before deletion.
 - Retain protects a volume from automatic backend deletion when its PVC is
   removed. It does not replace backups.
+- Global iSCSI CHAP and Low-Capacity Write are disabled in the tested SAN
+  Manager configuration. Do not enable them without separately validating
+  compatibility and failure behavior with the CSI driver.
 - A Synology snapshot remains on the same NAS and is not an independent
   backup.
 - An iSCSI filesystem PVC is single-writer storage. Use NFS/RWX only for a

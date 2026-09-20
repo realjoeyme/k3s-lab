@@ -68,6 +68,7 @@ The Synology CSI integration was validated against K3s v1.36.4+k3s1 and DSM
         ├── README.md
         ├── client-info.yml.example
         ├── storageclass.yaml
+        ├── synology-iscsi-delete.yaml
         ├── tests
         │   ├── pod-k3s-01.yaml
         │   ├── pod-k3s-02.yaml
@@ -105,12 +106,15 @@ Kubernetes Services of type LoadBalancer; the current pool contains
 ### Shared storage
 
 The official Synology CSI driver provisions LUNs, iSCSI targets and mappings
-on /volume1. The custom synology-iscsi-retain StorageClass:
+on /volume1. Two non-default StorageClasses are available:
 
-- Is not the default StorageClass
-- Uses ext4 and ReadWriteOnce
-- Supports online expansion
-- Uses Retain to protect application data from accidental PVC deletion
+- synology-iscsi-retain keeps the PV and Synology LUN after PVC deletion. Use
+  it for important application data that should require deliberate cleanup.
+- synology-iscsi-delete automatically removes the PV, Synology LUN and iSCSI
+  target after PVC deletion. Use it for disposable or easily recreated data.
+
+Both classes use ext4 and ReadWriteOnce, support online expansion and require
+workloads to opt in explicitly.
 
 The K3s local-path StorageClass remains the default for disposable and
 node-local data. Workloads must explicitly opt in to Synology storage.
@@ -265,6 +269,8 @@ after validation.
 - Private RFC1918 addresses document the lab topology and are not
   Internet-routable.
 - Retained volumes and Synology snapshots are not independent backups.
+- Deleting a PVC that uses synology-iscsi-delete permanently removes its
+  Synology LUN and data; verify the claim and StorageClass before deletion.
 
 ## Lessons learned
 
@@ -277,6 +283,8 @@ after validation.
 - A reachable DSM API does not by itself prove that TCP 3260 is listening.
 - A ReadWriteOnce volume can move between nodes after a clean detach.
 - Retain deliberately separates PVC deletion from backend data deletion.
+- A Delete reclaim policy intentionally couples PVC deletion to backend LUN
+  and target deletion.
 - Kubernetes Secret values are base64-encoded by the API; K3s Secrets
   encryption provides the separate at-rest protection in etcd.
 - Git history is useful only when credentials remain outside the repository
